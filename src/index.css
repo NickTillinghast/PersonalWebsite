@@ -1,27 +1,22 @@
 :root {
-  --bg: #0f1117;
-  --surface: #171a23;
-  --border: #262a36;
-  --text: #e6e8ee;
-  --muted: #9aa1b2;
-  --accent: #6ea8fe;
+  --bg: #282c33;
+  --surface: #2d3139;
+  --border: rgba(255, 255, 255, 0.22);
+  --text: #ffffff;
+  --muted: #abb2bf;
+  --green: #0BDA51;
+  --blue: #1f51ff;
+  --gradient: linear-gradient(90deg, var(--green), var(--blue));
 
-  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  line-height: 1.6;
+  --font-display: 'Orbitron', system-ui, sans-serif;
+  --font-body: 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  font-family: var(--font-body);
+  line-height: 1.65;
   color: var(--text);
   background: var(--bg);
+  color-scheme: dark;
   -webkit-font-smoothing: antialiased;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #fafafa;
-    --surface: #ffffff;
-    --border: #e4e6eb;
-    --text: #1a1d24;
-    --muted: #5b6272;
-    --accent: #2563eb;
-  }
 }
 
 * {
@@ -34,15 +29,23 @@ html {
 
 body {
   margin: 0;
+  background: var(--bg);
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--green);
+  color: var(--text);
 }
 
 a {
-  color: var(--accent);
+  color: var(--green);
   text-decoration: none;
+  transition: color 0.15s, text-shadow 0.15s;
 }
 
 a:hover {
-  text-decoration: underline;
+  text-shadow: 0 0 8px var(--green);
 }
 
 main {
@@ -52,7 +55,7 @@ main {
 }
 
 section {
-  padding: 5rem 0;
+  padding: 3rem 0;
   scroll-margin-top: 4rem;
 }
 
@@ -60,6 +63,14 @@ ul {
   list-style: none;
   padding: 0;
   margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
 }
 
 /* Nav */
@@ -71,37 +82,55 @@ ul {
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.5rem;
-  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--border);
 }
 
 .nav-logo {
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
   color: var(--text);
+}
+
+.logo-open {
+  color: var(--blue);
+}
+
+.logo-close {
+  color: var(--green);
+}
+
+.nav-logo:hover {
+  text-shadow: 0 0 10px var(--green);
 }
 
 .nav-links {
   display: flex;
-  gap: 1.5rem;
+  gap: 1.75rem;
 }
 
 .nav-links a {
   color: var(--muted);
-  text-transform: capitalize;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
 }
 
 .nav-links a:hover {
   color: var(--text);
-  text-decoration: none;
+  text-shadow: 0 0 8px var(--blue);
 }
 
 .nav-toggle {
   display: none;
   background: none;
-  border: none;
+  border: 1px solid var(--border);
   color: var(--text);
-  font-size: 1.5rem;
+  font-size: 1.1rem;
+  padding: 0.2rem 0.55rem;
   cursor: pointer;
 }
 
@@ -118,7 +147,7 @@ ul {
     right: 0;
     flex-direction: column;
     gap: 0;
-    background: var(--surface);
+    background: var(--bg);
     border-bottom: 1px solid var(--border);
   }
 
@@ -127,33 +156,68 @@ ul {
   }
 
   .nav-links a {
-    padding: 0.75rem 1.5rem;
+    padding: 0.85rem 1.5rem;
   }
 }
 
 /* Hero */
 .hero {
-  min-height: calc(100vh - 4rem);
+  position: relative;
+  isolation: isolate;
+  min-height: calc(85vh - 4rem);
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
+/* Faint synthwave grid fading in at the bottom of the hero */
+.hero::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 100vw;
+  height: 40%;
+  z-index: -1;
+  background-image:
+    linear-gradient(var(--blue) 1px, transparent 1px),
+    linear-gradient(90deg, var(--blue) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-position: center bottom;
+  opacity: 0.22;
+  mask-image: linear-gradient(to bottom, transparent, black 90%);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
 .eyebrow {
-  color: var(--accent);
+  color: var(--green);
   margin: 0;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
 }
 
 .hero h1 {
-  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  font-size: clamp(2.25rem, 8vw, 4.5rem);
+  font-weight: 800;
   line-height: 1.1;
-  margin: 0.25rem 0;
+  margin: 0.5rem 0;
+  text-shadow:
+    0 0 6px color-mix(in srgb, var(--green) 60%, transparent),
+    0 0 18px color-mix(in srgb, var(--green) 60%, transparent),
+    0 0 44px color-mix(in srgb, var(--blue) 60%, transparent);
 }
 
 .hero h2 {
-  font-size: clamp(1.5rem, 5vw, 2.5rem);
-  color: var(--muted);
+  font-size: clamp(1.25rem, 4.5vw, 2.25rem);
+  font-weight: 700;
   margin: 0;
+  width: fit-content;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .tagline {
@@ -172,45 +236,66 @@ ul {
 /* Buttons */
 .btn {
   display: inline-block;
-  padding: 0.7rem 1.4rem;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  padding: 0.7rem 1.5rem;
+  border: 1px solid var(--blue);
+  background: transparent;
   color: var(--text);
-  font-weight: 600;
-  transition: transform 0.15s, border-color 0.15s;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: box-shadow 0.25s, transform 0.15s, background 0.15s, text-shadow 0.25s;
 }
 
 .btn:hover {
-  text-decoration: none;
-  border-color: var(--accent);
-  transform: translateY(-2px);
+  text-shadow: none;
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--blue);
 }
 
 .btn-primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
+  border-color: var(--green);
+}
+
+.btn-primary:hover {
+  background: color-mix(in srgb, var(--green) 12%, transparent);
+  text-shadow: 0 0 8px var(--green);
+  box-shadow:
+    4px 4px 0 var(--green),
+    0 0 16px color-mix(in srgb, var(--green) 70%, transparent),
+    0 0 40px color-mix(in srgb, var(--green) 35%, transparent);
 }
 
 /* Sections */
 .section-title {
-  font-size: 1.75rem;
+  font-size: 1.6rem;
+  font-weight: 700;
   margin: 0 0 1.5rem;
 }
 
 .section-title::after {
   content: '';
   display: block;
-  width: 3rem;
-  height: 3px;
-  margin-top: 0.5rem;
-  background: var(--accent);
-  border-radius: 2px;
+  width: 4rem;
+  height: 1px;
+  margin-top: 0.75rem;
+  background: var(--gradient);
+  box-shadow: 0 0 8px var(--green);
 }
 
 #about p {
   color: var(--muted);
   max-width: 42rem;
+}
+
+.subheading {
+  margin: 1.75rem 0 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--blue);
 }
 
 .skills,
@@ -220,9 +305,18 @@ ul {
   gap: 0.5rem;
 }
 
-.subheading {
-  margin: 2rem 0 0.75rem;
-  font-size: 1rem;
+.skills li,
+.tech li {
+  padding: 0.3rem 0.8rem;
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+  color: var(--muted);
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.skills li:hover {
+  border-color: var(--green);
+  color: var(--text);
 }
 
 /* Experience */
@@ -230,12 +324,12 @@ ul {
   list-style: none;
   padding: 0;
   margin: 0;
-  border-left: 2px solid var(--border);
+  border-left: 1px solid var(--blue);
 }
 
 .timeline-item {
   position: relative;
-  padding: 0 0 2.5rem 1.75rem;
+  padding: 0 0 2rem 1.75rem;
 }
 
 .timeline-item:last-child {
@@ -245,12 +339,12 @@ ul {
 .timeline-item::before {
   content: '';
   position: absolute;
-  left: -7px;
-  top: 0.45rem;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--accent);
+  left: -5px;
+  top: 0.5rem;
+  width: 9px;
+  height: 9px;
+  background: var(--green);
+  box-shadow: 0 0 10px var(--green);
 }
 
 .timeline-header {
@@ -263,17 +357,22 @@ ul {
 
 .timeline-header h4 {
   margin: 0;
-  font-size: 1.15rem;
+  font-size: 1.05rem;
+  font-weight: 500;
 }
 
 .company {
-  color: var(--accent);
+  color: var(--green);
 }
 
 .dates,
 .location {
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+}
+
+.dates {
+  letter-spacing: 0.05em;
 }
 
 .location {
@@ -281,49 +380,92 @@ ul {
 }
 
 .highlights {
-  list-style: disc;
-  padding-left: 1.25rem;
+  list-style: none;
   color: var(--muted);
 }
 
 .highlights li {
-  margin-bottom: 0.4rem;
+  position: relative;
+  padding-left: 1.25rem;
+  margin-bottom: 0.45rem;
 }
 
-.skills li,
-.tech li {
-  padding: 0.3rem 0.8rem;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  font-size: 0.85rem;
-  color: var(--muted);
+.highlights li::before {
+  content: '▹';
+  position: absolute;
+  left: 0;
+  color: var(--blue);
+}
+
+/* Grid behind Projects + Contact: lines shift from blue (top) to pink (bottom) */
+.grid-zone {
+  position: relative;
+  isolation: isolate;
+}
+
+.grid-zone::before,
+.grid-zone::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* The color gradient, cut down to just the grid lines by the mask */
+.grid-zone::before {
+  z-index: -2;
+  background: linear-gradient(to bottom, var(--blue), var(--green));
+  mask-image:
+    linear-gradient(#000 1px, transparent 1px),
+    linear-gradient(90deg, #000 1px, transparent 1px);
+  mask-size: 48px 48px;
+  mask-position: center top;
+  opacity: 0.3;
+}
+
+/* Fades the grid in at the top so it rises out of the Experience section */
+.grid-zone::after {
+  z-index: -1;
+  background: linear-gradient(to bottom, var(--bg) 0%, transparent 35%);
 }
 
 /* Projects */
 .project-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1.25rem;
+  gap: 1.5rem;
 }
 
 .card {
   display: flex;
   flex-direction: column;
   padding: 1.5rem;
-  background: var(--surface);
+  background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  transition: transform 0.15s, border-color 0.15s;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.25s;
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  border-color: var(--accent);
+  transform: translate(-3px, -3px);
+  border-color: var(--green);
+  box-shadow:
+    6px 6px 0 var(--blue),
+    0 0 16px color-mix(in srgb, var(--green) 60%, transparent),
+    0 0 40px color-mix(in srgb, var(--green) 30%, transparent);
+}
+
+.card:hover h4 {
+  text-shadow: 0 0 8px var(--green);
 }
 
 .card h4 {
-  margin: 0 0 0.5rem;
-  font-size: 1.2rem;
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 700;
 }
 
 .card p {
@@ -333,8 +475,9 @@ ul {
 
 .card-links {
   display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+  font-size: 0.9rem;
 }
 
 /* Contact */
@@ -349,20 +492,33 @@ ul {
 .contact p {
   color: var(--muted);
   max-width: 32rem;
-  margin: 0 auto 1.5rem;
+  margin: 0 auto 2rem;
 }
 
 .socials {
   display: flex;
   justify-content: center;
   gap: 1.5rem;
-  margin-top: 2rem;
+  margin-top: 2.25rem;
+}
+
+.socials a {
+  color: var(--muted);
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+}
+
+.socials a:hover {
+  color: var(--text);
+  text-shadow: 0 0 8px var(--blue);
 }
 
 footer {
   text-align: center;
   padding: 2rem;
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
   border-top: 1px solid var(--border);
 }

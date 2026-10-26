@@ -16,8 +16,10 @@ export default function App() {
         <Hero />
         <About />
         <Experience />
-        <Projects />
-        <Contact />
+        <div className="grid-zone">
+          <Projects />
+          <Contact />
+        </div>
       </main>
       <footer>
         © {year} {profile.name}

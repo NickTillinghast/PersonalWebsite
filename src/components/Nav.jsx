@@ -8,8 +8,10 @@ export default function Nav() {
 
   return (
     <header className="nav">
-      <a href="#top" className="nav-logo">
-        {profile.name}
+      <a href="#top" className="nav-logo" aria-label={`${profile.name} — back to top`}>
+        <span className="logo-open">&lt;</span>
+        NT
+        <span className="logo-close">/&gt;</span>
       </a>
       <button
         className="nav-toggle"

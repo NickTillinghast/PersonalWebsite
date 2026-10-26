@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { profile } from '../data'
 
-const links = ['about', 'projects', 'contact']
+const links = ['about', 'experience', 'projects', 'contact']
 
 export default function Nav() {
   const [open, setOpen] = useState(false)

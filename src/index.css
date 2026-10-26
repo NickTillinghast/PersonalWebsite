@@ -220,8 +220,74 @@ ul {
   gap: 0.5rem;
 }
 
-.skills {
-  margin-top: 1.5rem;
+.subheading {
+  margin: 2rem 0 0.75rem;
+  font-size: 1rem;
+}
+
+/* Experience */
+.timeline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-left: 2px solid var(--border);
+}
+
+.timeline-item {
+  position: relative;
+  padding: 0 0 2.5rem 1.75rem;
+}
+
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -7px;
+  top: 0.45rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.timeline-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.25rem 1rem;
+}
+
+.timeline-header h4 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.company {
+  color: var(--accent);
+}
+
+.dates,
+.location {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.location {
+  margin: 0.15rem 0 0.75rem;
+}
+
+.highlights {
+  list-style: disc;
+  padding-left: 1.25rem;
+  color: var(--muted);
+}
+
+.highlights li {
+  margin-bottom: 0.4rem;
 }
 
 .skills li,

@@ -11,9 +11,11 @@ export default function Hero() {
         <a href="#projects" className="btn btn-primary">
           View my work
         </a>
-        <a href={profile.resumeUrl} className="btn">
-          Resume
-        </a>
+        {profile.resumeUrl && (
+          <a href={profile.resumeUrl} className="btn">
+            Resume
+          </a>
+        )}
       </div>
     </section>
   )

@@ -78,11 +78,18 @@ export const interests = ['Photography', 'Drums', 'Music', 'Puzzles', 'Krav Maga
 // TODO: replace the placeholders with real projects (live URL + GitHub repo).
 export const projects = [
   {
-    title: 'thisisdevmtn.com',
-    description: 'Full-stack team project built during the Devmountain program in an agile environment.',
-    tech: ['JavaScript', 'React', 'Node.js'],
+    title: "Nick's House of Horrors",
+    description: 'Horror movie hub with search, where-to-stream info, user lists, comments and a quiz. Pulls movie data from the TMDB and Watchmode APIs, stores users and lists in Supabase, and deploys to AWS Lambda and CloudFront through CloudFormation.',
+    tech: ['Next.js', 'TypeScript', 'Supabase', 'AWS', 'CloudFormation'],
+    liveUrl: 'https://nickshouseofhorrors.com',
+    repoUrl: 'https://github.com/NickTillinghast/nickshouseofhorrors',
+  },
+  {
+    title: 'Amethyst & Ash',
+    description: 'Website for a sobriety coaching business, with pages for the method, coaching offers, a quiz, scholarships and contact. Copy lives in one content file, forms run on server actions, and it generates its own sitemap and social share images.',
+    tech: ['Next.js', 'TypeScript', 'React'],
     liveUrl: '',
-    repoUrl: '',
+    repoUrl: 'https://github.com/NickTillinghast/amethystandash',
   },
   {
     title: "Junior's Barber Parlor",
@@ -92,9 +99,9 @@ export const projects = [
     repoUrl: 'https://github.com/NickTillinghast/juniors',
   },
   {
-    title: 'Project Three',
-    description: 'Placeholder — an Astro or Next.js build would round this out nicely.',
-    tech: ['Astro'],
+    title: 'thisisdevmtn.com',
+    description: 'Full-stack team project built during the Devmountain program in an agile environment.',
+    tech: ['JavaScript', 'React', 'Node.js'],
     liveUrl: '',
     repoUrl: '',
   },

@@ -1,16 +1,14 @@
-# React + Vite
+# Portfolio: "Midnight Matinee"
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Static site built with [Astro](https://astro.build). No client JavaScript except the phone menu toggle.
 
-Currently, two official plugins are available:
+```sh
+npm run dev        # http://localhost:3000
+npm run build      # static output in dist/
+npm test           # Playwright: pages load, nav works, no sideways scroll at 360px
+npm run og-image   # regenerate public/og.png (social share image)
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+- **Copy:** everything lives in `src/content.ts`. Anything in `[BRACKETS]` is a placeholder.
+- **Domain:** set `site` in `astro.config.mjs` (used for canonical and share-image URLs).
+- **Tests locally** use the installed Google Chrome, because Playwright's bundled browsers don't run on macOS 13. CI uses bundled Chromium.

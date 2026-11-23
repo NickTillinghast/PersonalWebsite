@@ -1,0 +1,117 @@
+---
+import type { Project } from '../content'
+
+interface Props {
+  project: Project
+  number: number
+}
+
+const { project, number } = Astro.props
+const num = String(number).padStart(2, '0')
+const external = (href: string) => /^https?:/.test(href)
+---
+
+<article class:list={['card', { featured: project.featured }]}>
+  <div class="poster">
+    <p class="label poster-tag">{num} · {project.tag}</p>
+    <h3 class="display poster-title">{project.title}</h3>
+    {
+      project.image ? (
+        <img class="poster-img" src={project.image} alt={project.imageAlt ?? ''} loading="lazy" />
+      ) : (
+        <p class="poster-slot">{project.featured ? '[SCREENSHOT OR POSTER ART]' : '[SCREENSHOT]'}</p>
+      )
+    }
+  </div>
+  <div class="body">
+    <p class="summary">{project.summary}</p>
+    <p class="stack">{project.stack.join(' · ')}</p>
+    <p class="links">
+      {
+        project.links.map((link) => (
+          <a href={link.href} {...(external(link.href) ? { rel: 'noopener' } : {})}>
+            {link.label}
+            <span class="visually-hidden">: {project.title}</span>
+          </a>
+        ))
+      }
+    </p>
+  </div>
+</article>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    background: var(--card);
+    border: 1px solid var(--border);
+  }
+  .poster {
+    aspect-ratio: 2 / 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 24px;
+    background: var(--poster);
+    border-bottom: 3px solid var(--border-strong);
+  }
+  .featured .poster {
+    background: var(--poster-featured);
+    border-bottom-color: var(--red);
+  }
+  .poster-tag {
+    color: var(--dim);
+  }
+  .featured .poster-tag {
+    color: var(--red-light);
+  }
+  .poster-title {
+    font-size: 44px;
+    overflow-wrap: break-word;
+  }
+  .featured .poster-title {
+    color: var(--red);
+  }
+  .poster-slot {
+    margin: 0;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .poster-img {
+    border: 1px solid var(--border);
+  }
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 24px;
+  }
+  .summary {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text-soft);
+  }
+  .stack {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--dim);
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    margin: 0;
+    font-weight: 600;
+  }
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+</style>

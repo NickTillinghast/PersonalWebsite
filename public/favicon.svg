@@ -1,10 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- <NT/> monogram. Letters are drawn as strokes (not text) so the icon
-       doesn't depend on any font loading. -->
-  <rect width="64" height="64" rx="4" fill="#282c33"/>
-  <g fill="none" stroke-width="3.5" stroke-linecap="square" stroke-linejoin="bevel">
-    <path d="M12 23L4 32L12 41" stroke="#1f51ff"/>
-    <path d="M17 41V23L27 41V23M32 23H42M37 23V41" stroke="#ffffff"/>
-    <path d="M46 43L50.5 21M54 23L61 32L54 41" stroke="#ff10f0"/>
-  </g>
+  <!-- "N" drawn as a path so it doesn't depend on a font loading. -->
+  <rect width="64" height="64" rx="2" fill="#0b0b0d"/>
+  <path d="M18 50V14h9l10 20V14h9v36h-9L27 30v20z" fill="#e0393e"/>
 </svg>

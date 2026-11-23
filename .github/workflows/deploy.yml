@@ -79,9 +79,14 @@ jobs:
             --query "Stacks[0].Outputs[?OutputKey=='SiteBucketName'].OutputValue" --output text)" >> "$GITHUB_ENV"
 
       # Hashed build files first, so new pages never ask for files that aren't there yet.
-      # Old ones are kept (no --delete) so tabs opened before this deploy keep working
+      # Old ones are kept (no --delete) so tabs opened before this deploy keep working.
+      # Astro inlines small CSS and scripts, so a build can have no _astro folder at all
       - name: Upload hashed files
         run: |
+          if [ ! -d dist/_astro ]; then
+            echo "No dist/_astro in this build, nothing to upload"
+            exit 0
+          fi
           aws s3 sync dist/_astro "s3://$BUCKET/_astro" \
             --cache-control "public,max-age=31536000,immutable"
 

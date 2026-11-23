@@ -38,9 +38,15 @@ const external = (href: string) => /^https?:/.test(href)
     <p class="links">
       {
         project.links.map((link) => (
-          <a href={link.href} {...(external(link.href) ? { rel: 'noopener' } : {})}>
+          <a
+            href={link.href}
+            {...(external(link.href) ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+          >
             {link.label}
-            <span class="visually-hidden">: {project.title}</span>
+            <span class="visually-hidden">
+              : {project.title}
+              {external(link.href) && ' (opens in a new tab)'}
+            </span>
           </a>
         ))
       }

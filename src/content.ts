@@ -3,6 +3,7 @@
 import type { ImageMetadata } from 'astro'
 import amethystShot from './assets/amethystandash.png'
 import horrorsShot from './assets/nickshouseofhorrors.png'
+import juniorsShot from './assets/juniors.png'
 
 export const person = {
   firstName: 'Nick',
@@ -83,6 +84,8 @@ export const projects: Project[] = [
   },
   {
     title: "Junior's Barber Parlor",
+    image: juniorsShot,
+    imageAlt: "The Junior's Barber Parlor homepage",
     tag: 'Feature',
     summary:
       'Website for a classic barbershop in midtown Phoenix, with services, team, booking and location pages.',
@@ -96,14 +99,20 @@ export const projects: Project[] = [
 
 // Draft: trimmed from the About text on the old site. Rewrite in your own voice.
 export const about = [
-  "I spent ten years running my own photography business in Phoenix, shooting corporate events and weddings. In 2019 I switched to software through Devmountain's full-stack program, and I've been building for the web ever since.",
-  "I like turning designs into polished, reusable components and building internal tools that take manual work off people's plates. [What kind of team or problem you want next.]",
+  "I spent over ten years running my own photography business in Phoenix, shooting corporate events and weddings. In 2019 I switched to software through Devmountain's full-stack program, and I've been building for the web ever since.",
+  "I like turning designs into polished, reusable components and building internal tools that take manual work off people's plates. I'm looking for a team where I can pull more than my weight, and where the people matter as much as the work.",
   'Off hours I build side projects like Nicks House of Horrors, because the best way I know to learn a new tool is to ship something with it.',
 ]
 
-export const offTheClock = [
+// An item with an href turns its title into a link.
+export const offTheClock: { label: string; title: string; note: string; href?: string }[] = [
   { label: 'Currently watching', title: 'Predator (1987)', note: 'All-time pick: The Thing (1982)' },
-  { label: 'Behind the camera', title: 'Photography', note: '10+ years shooting events and weddings.' },
+  {
+    label: 'Behind the camera',
+    title: 'Photography',
+    href: 'https://www.instagram.com/nicktillinghastphotography/',
+    note: '10+ years shooting events and weddings.',
+  },
   { label: 'Also', title: 'Drums, heavy metal, Krav Maga', note: 'The holy trinity of fun.' },
 ]
 
@@ -113,6 +122,6 @@ export const contact = {
   socials: [
     { label: 'GitHub', href: 'https://github.com/NickTillinghast' },
     { label: 'LinkedIn', href: 'https://www.linkedin.com/in/nick-tillinghast-065b2951' },
-    { label: 'Instagram', href: '' },
+    { label: 'Instagram', href: 'https://www.instagram.com/nicktillinghast/' },
   ],
 }

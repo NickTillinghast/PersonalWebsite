@@ -57,7 +57,16 @@ import { about, contact, hero, offTheClock, person, projects } from '../content'
           offTheClock.map((item) => (
             <div class="tile glow">
               <p class="label">{item.label}</p>
-              <p class="tile-title">{item.title}</p>
+              <p class="tile-title">
+                {item.href ? (
+                  <a href={item.href} rel="noopener">
+                    {item.title}
+                    <span class="arrow" aria-hidden="true"> ↗</span>
+                  </a>
+                ) : (
+                  item.title
+                )}
+              </p>
               <p class="tile-note">{item.note}</p>
             </div>
           ))
@@ -183,6 +192,14 @@ import { about, contact, hero, offTheClock, person, projects } from '../content'
   }
   .tile p {
     margin: 0;
+  }
+  .tile-title a {
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+  .tile-title .arrow {
+    color: var(--red-light);
+    font-size: 0.8em;
   }
   .tile-title {
     font-size: 22px;

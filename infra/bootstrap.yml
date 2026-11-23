@@ -1,0 +1,137 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  nicktillinghast.com, one-time setup (deploy by hand, as an admin).
+  The site bucket and the GitHub deploy role. Keeping IAM here means a push
+  to main can never create new roles.
+
+Parameters:
+  GitHubOwner:
+    Type: String
+    Default: NickTillinghast
+  GitHubRepoName:
+    Type: String
+    Default: PersonalWebsite
+  # GitHub's sign-in token names the repo with these permanent ids too, so a renamed or
+  # re-created repo with the same name can't deploy.
+  # From https://api.github.com/repos/<owner>/<repo> (owner.id and id)
+  GitHubOwnerId:
+    Type: String
+    Default: "52227772"
+  GitHubRepoId:
+    Type: String
+    Default: "1434811928"
+
+Resources:
+  # The built site (dist/). Private: only CloudFront can read it (policy in app.yml)
+  SiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+  # GitHub Actions assumes this on every push to main. It can upload the site, deploy
+  # the app stack and clear the cache. It can't touch IAM at all.
+  # Uses the GitHub sign-in provider the nickshouseofhorrors bootstrap already created.
+  DeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      MaxSessionDuration: 3600
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+                # Only the main branch. GitHub now sends the form with ids; the plain
+                # form is kept in case a repo setting switches back to it
+                token.actions.githubusercontent.com:sub:
+                  - !Sub repo:${GitHubOwner}@${GitHubOwnerId}/${GitHubRepoName}@${GitHubRepoId}:ref:refs/heads/main
+                  - !Sub repo:${GitHubOwner}/${GitHubRepoName}:ref:refs/heads/main
+      Policies:
+        - PolicyName: deploy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: SiteFiles
+                Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:DeleteObject
+                Resource: !Sub ${SiteBucket.Arn}/*
+              - Sid: SiteBucket
+                Effect: Allow
+                Action:
+                  - s3:ListBucket
+                  - s3:GetBucketPolicy
+                  - s3:PutBucketPolicy
+                  - s3:DeleteBucketPolicy
+                Resource: !GetAtt SiteBucket.Arn
+              - Sid: AppStack
+                Effect: Allow
+                Action:
+                  - cloudformation:CreateStack
+                  - cloudformation:UpdateStack
+                  - cloudformation:DescribeStacks
+                  - cloudformation:DescribeStackEvents
+                  - cloudformation:DescribeStackResources
+                  - cloudformation:GetTemplate
+                  - cloudformation:CreateChangeSet
+                  - cloudformation:DescribeChangeSet
+                  - cloudformation:ExecuteChangeSet
+                  - cloudformation:DeleteChangeSet
+                Resource: !Sub arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/nicktillinghast-app/*
+              - Sid: ReadOtherStacks
+                Effect: Allow
+                Action:
+                  - cloudformation:DescribeStacks
+                  - cloudformation:ListExports
+                  - cloudformation:GetTemplateSummary
+                  - cloudformation:ValidateTemplate
+                Resource: "*"
+              # CloudFront has no per-resource names to scope to before they exist
+              - Sid: Cdn
+                Effect: Allow
+                Action: cloudfront:*
+                Resource: "*"
+              - Sid: Dns
+                Effect: Allow
+                Action:
+                  - route53:ChangeResourceRecordSets
+                  - route53:GetHostedZone
+                  - route53:ListResourceRecordSets
+                  - route53:GetChange
+                Resource:
+                  - !Sub arn:${AWS::Partition}:route53:::hostedzone/*
+                  - !Sub arn:${AWS::Partition}:route53:::change/*
+
+Outputs:
+  DeployRoleArn:
+    Description: Put this in the GitHub repo variable AWS_DEPLOY_ROLE_ARN
+    Value: !GetAtt DeployRole.Arn
+  SiteBucketName:
+    Value: !Ref SiteBucket
+    Export:
+      Name: nicktillinghast-site-bucket
+  SiteBucketArn:
+    Value: !GetAtt SiteBucket.Arn
+    Export:
+      Name: nicktillinghast-site-bucket-arn
+  SiteBucketDomain:
+    Value: !GetAtt SiteBucket.RegionalDomainName
+    Export:
+      Name: nicktillinghast-site-bucket-domain

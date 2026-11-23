@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  nicktillinghast.com, one-time, after the domain's nameservers point at Route 53:
+  the HTTPS certificate for CloudFront. Must be in us-east-1. It adds its own
+  validation records to the hosted zone, then waits until AWS issues it
+  (minutes, up to a few hours while the nameserver change spreads).
+
+Parameters:
+  DomainName:
+    Type: String
+    Default: nicktillinghast.com
+
+Resources:
+  Certificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Ref DomainName
+      SubjectAlternativeNames:
+        - !Sub www.${DomainName}
+      ValidationMethod: DNS
+      DomainValidationOptions:
+        - DomainName: !Ref DomainName
+          HostedZoneId: !ImportValue nicktillinghast-hosted-zone-id
+        - DomainName: !Sub www.${DomainName}
+          HostedZoneId: !ImportValue nicktillinghast-hosted-zone-id
+
+Outputs:
+  CertificateArn:
+    Value: !Ref Certificate
+    Export:
+      Name: nicktillinghast-certificate-arn

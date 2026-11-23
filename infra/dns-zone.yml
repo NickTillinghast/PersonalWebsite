@@ -1,0 +1,91 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  nicktillinghast.com, one-time: the Route 53 hosted zone. Finishes right away.
+  Copy the NameServers output into GoDaddy ("I'll use my own nameservers"),
+  then deploy dns-cert.yml.
+
+Parameters:
+  DomainName:
+    Type: String
+    Default: nicktillinghast.com
+  EmailForwarding:
+    Type: String
+    Default: none
+    AllowedValues: [none, improvmx]
+    Description: >-
+      "improvmx" adds the MX and SPF records so ImprovMX can forward mail sent to
+      @nicktillinghast.com to an existing inbox (set up the domain in ImprovMX too).
+      "none" means the domain receives no email.
+  # Proves to Google Search Console that we own the domain. Not a secret: anyone can look it up.
+  GoogleSiteVerification:
+    Type: String
+    Default: ""
+    Description: e.g. google-site-verification=abc123
+
+Conditions:
+  HasEmail: !Equals [!Ref EmailForwarding, improvmx]
+  HasGoogleSiteVerification: !Not [!Equals [!Ref GoogleSiteVerification, ""]]
+  HasRootTxt: !Or [!Condition HasEmail, !Condition HasGoogleSiteVerification]
+
+Resources:
+  HostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: !Ref DomainName
+      HostedZoneConfig:
+        Comment: Portfolio (registered at GoDaddy, DNS here)
+
+  # TXT records on the bare domain. A domain can have only ONE SPF ("v=spf1 ...") value:
+  # add new senders as another include: in that same line, never as a second SPF entry
+  RootTxt:
+    Type: AWS::Route53::RecordSet
+    Condition: HasRootTxt
+    Properties:
+      HostedZoneId: !Ref HostedZone
+      Name: !Ref DomainName
+      Type: TXT
+      TTL: "300"
+      ResourceRecords:
+        - !If
+          - HasEmail
+          - '"v=spf1 include:spf.improvmx.com ~all"'
+          - !Ref AWS::NoValue
+        - !If
+          - HasGoogleSiteVerification
+          - !Sub '"${GoogleSiteVerification}"'
+          - !Ref AWS::NoValue
+
+  # Incoming email: ImprovMX forwards mail sent to @nicktillinghast.com to an existing inbox.
+  # Aliases are managed in the ImprovMX dashboard
+  Mx:
+    Type: AWS::Route53::RecordSet
+    Condition: HasEmail
+    Properties:
+      HostedZoneId: !Ref HostedZone
+      Name: !Ref DomainName
+      Type: MX
+      TTL: "300"
+      ResourceRecords:
+        - 10 mx1.improvmx.com
+        - 20 mx2.improvmx.com
+
+  # Tells inboxes what to do with mail claiming to be from this domain that fails SPF/DKIM.
+  # p=none only monitors; with no email at all, it still makes spoofing easier to spot
+  Dmarc:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZone
+      Name: !Sub _dmarc.${DomainName}
+      Type: TXT
+      TTL: "300"
+      ResourceRecords:
+        - '"v=DMARC1; p=none;"'
+
+Outputs:
+  HostedZoneId:
+    Value: !Ref HostedZone
+    Export:
+      Name: nicktillinghast-hosted-zone-id
+  NameServers:
+    Description: Paste these 4 into GoDaddy
+    Value: !Join [", ", !GetAtt HostedZone.NameServers]

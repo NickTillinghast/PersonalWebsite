@@ -2,7 +2,7 @@
 // Run `npm run og-image` again after changing the name or tagline.
 import { chromium } from '@playwright/test'
 
-const name = 'Nick [LAST NAME]' // TODO: real last name
+const name = 'Nick Tillinghast'
 
 const html = `<!doctype html><html><head>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">

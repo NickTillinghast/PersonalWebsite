@@ -2,8 +2,8 @@
 
 export const person = {
   firstName: 'Nick',
-  lastName: '[LAST NAME]',
-  email: '', // e.g. 'you@example.com'. The contact section shows [YOUR EMAIL] until set.
+  lastName: 'Tillinghast',
+  email: 'nicktilling73@gmail.com',
   role: 'Software Engineer',
   location: 'Colorado',
 }

@@ -10,5 +10,5 @@ npm run og-image   # regenerate public/og.png (social share image)
 ```
 
 - **Copy:** everything lives in `src/content.ts`. Anything in `[BRACKETS]` is a placeholder.
-- **Domain:** set `site` in `astro.config.mjs` (used for canonical and share-image URLs).
+- **Hosting:** AWS (S3 + CloudFront), deployed on every push to `main`. Setup steps are in [infra/README.md](infra/README.md).
 - **Tests locally** use the installed Google Chrome, because Playwright's bundled browsers don't run on macOS 13. CI uses bundled Chromium.

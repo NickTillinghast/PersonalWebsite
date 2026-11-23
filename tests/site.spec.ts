@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 // Add new pages here so they get the same checks.
-const pages = ['/']
+const pages = ['/', '/404.html']
 
 for (const path of pages) {
   test(`${path} loads with a title, description and h1`, async ({ page }) => {

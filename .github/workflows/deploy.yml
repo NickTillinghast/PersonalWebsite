@@ -1,0 +1,116 @@
+# Every push to main: lint, build and test the site, then upload it to AWS.
+# One-time AWS setup comes first, see infra/README.md
+
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # "Run workflow" button in the Actions tab
+  workflow_dispatch:
+
+# OIDC sign-in to AWS needs id-token; nothing here writes to the repo
+permissions:
+  id-token: write
+  contents: read
+
+# One deploy at a time, and never cancel one halfway through a CloudFormation update
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: us-east-1
+  APP_STACK: nicktillinghast-app
+  BOOTSTRAP_STACK: nicktillinghast-bootstrap
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npx playwright install --with-deps chromium
+      # Builds the site and tests the build (see playwright.config.ts)
+      - run: npm test
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dist
+          path: dist
+          retention-days: 7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.13"
+      - name: Lint CloudFormation
+        run: |
+          pip install --quiet cfn-lint
+          cfn-lint --regions us-east-1 -- infra/*.yml
+
+  deploy:
+    needs: check
+    # Only main deploys. Skipped until the one-time AWS setup is done (infra/README.md step 5)
+    if: github.ref == 'refs/heads/main' && vars.AWS_DEPLOY_ROLE_ARN != ''
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # The exact build the tests ran against
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dist
+          path: dist
+
+      - name: Sign in to AWS
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Look up the site bucket
+        run: |
+          echo "BUCKET=$(aws cloudformation describe-stacks --stack-name "$BOOTSTRAP_STACK" \
+            --query "Stacks[0].Outputs[?OutputKey=='SiteBucketName'].OutputValue" --output text)" >> "$GITHUB_ENV"
+
+      # Hashed build files first, so new pages never ask for files that aren't there yet.
+      # Old ones are kept (no --delete) so tabs opened before this deploy keep working
+      - name: Upload hashed files
+        run: |
+          aws s3 sync dist/_astro "s3://$BUCKET/_astro" \
+            --cache-control "public,max-age=31536000,immutable"
+
+      # Everything else (HTML, images, og.png) is rechecked on every visit.
+      # --delete removes pages that no longer exist
+      - name: Upload pages
+        run: |
+          aws s3 sync dist "s3://$BUCKET" \
+            --exclude "_astro/*" \
+            --delete \
+            --cache-control "public,max-age=0,must-revalidate"
+
+      # The first run creates the stack; CloudFront takes 5-15 minutes the first time
+      - name: Deploy the app stack
+        run: |
+          aws cloudformation deploy \
+            --stack-name "$APP_STACK" \
+            --template-file infra/app.yml \
+            --no-fail-on-empty-changeset
+
+      # "/*" counts as one path (1,000 a month are free)
+      - name: Clear CloudFront's cache
+        run: |
+          DIST="$(aws cloudformation describe-stacks --stack-name "$APP_STACK" \
+            --query "Stacks[0].Outputs[?OutputKey=='DistributionId'].OutputValue" --output text)"
+          aws cloudfront create-invalidation --distribution-id "$DIST" --paths "/*" \
+            --query "Invalidation.Id" --output text
+
+      - name: Site address
+        run: |
+          aws cloudformation describe-stacks --stack-name "$APP_STACK" \
+            --query "Stacks[0].Outputs" --output table
